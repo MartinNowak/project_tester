@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>DMD_REF</name>
+          <description>stable or 5055</description>
+          <defaultValue>stable</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>DRUNTIME_REF</name>
+          <description>stable or 5055</description>
+          <defaultValue>stable</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>PHOBOS_REF</name>
+          <description>stable or 5055</description>
+          <defaultValue>stable</defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>set -o pipefail
+
+DMD=dmd
+N=4
+
+# project ref
+clone() {
+    if [[ $2 =~ ^[0-9]+$ ]]; then
+        git init $1
+        git -C $1 fetch --depth=1 git://github.com/D-Programming-Language/$1.git pull/$2/merge
+        git -C $1 checkout FETCH_HEAD
+    else
+        git clone --depth=1 -b $2 git://github.com/D-Programming-Language/$1.git
+    fi
+    git -C $1 log
+}
+clone dmd $DMD_REF
+clone druntime $DRUNTIME_REF
+clone phobos $PHOBOS_REF
+
+make -j$N -C dmd/src -f posix.mak HOST_DMD=$DMD
+make -j$N -C dmd/src -f posix.mak HOST_DMD=$DMD dmd.conf
+make -j$N -C druntime -f posix.mak
+make -j$N -C phobos -f posix.mak
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.28">
+      <deleteDirs>false</deleteDirs>
+      <cleanupParameter></cleanupParameter>
+      <externalDelete></externalDelete>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+  </buildWrappers>
+</project>
