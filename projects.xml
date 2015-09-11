@@ -110,18 +110,9 @@ case $REPO in
 		;;
 	# matrix build for vibe.d
 	rejectedsoftware/vibe.d)
-		dub test --compiler=$DC --config=libevent
-		dub test --compiler=$DC --config=libev
-		dub test --compiler=$DC --config=libasync
-
-		for ex in $(\ls -1 examples/); do
-			echo &quot;[INFO] Building example $ex&quot;
-			(cd examples/$ex &amp;&amp; dub build --compiler=${DC})
-		done
-		for ex in $(\ls -1 tests/); do
-			echo &quot;[INFO] Running test $ex&quot;
-			(cd tests/$ex &amp;&amp; dub --compiler=${DC})
-		done
+		VIBED_DRIVER=libevent BUILD_EXAMPLE=1 RUN_TEST=1 ./travis-ci.sh
+		VIBED_DRIVER=libev BUILD_EXAMPLE=0 RUN_TEST=0 ./travis-ci.sh
+		VIBED_DRIVER=libasync BUILD_EXAMPLE=0 RUN_TEST=0 ./travis-ci.sh
 		;;
 	# .travis.yml
 	*)
