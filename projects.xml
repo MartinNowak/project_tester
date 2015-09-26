@@ -62,6 +62,7 @@
         <string>kiith-sa/tharsis.prof</string>
         <string>kyllingstad/zmqd</string>
         <string>lgvz/imageformats</string>
+        <string>mleise/fast</string>
         <string>msgpack/msgpack-d</string>
         <string>msoucy/dproto</string>
         <string>nomad-software/dunit</string>
@@ -106,7 +107,7 @@ case $REPO in
     # default dub projects w/o .travis.yml
 	kyllingstad/zmqd|Dgame/Dgame|PhilippeSigaud/Pegged|\
 	eBookingServices/mysql-lited|gecko0307/dlib|yazd/backtrace-d|\
-	lgvz/imageformats|s-ludwig/taggedalgebraic)
+	lgvz/imageformats|s-ludwig/taggedalgebraic|mleise/fast)
 		dub test --compiler=${DC}
 		;;
 	# matrix build for vibe.d
