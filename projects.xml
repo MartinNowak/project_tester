@@ -104,6 +104,10 @@ case $REPO in
 	gtkd-developers/GtkD)
 		make test DC=${DC}
 		;;
+    # can&apos;t use DMD/DC from env yet
+    Higgs/higgjs)
+		make -C source test DC=${DC}
+		;;
     # default dub projects w/o .travis.yml
 	kyllingstad/zmqd|Dgame/Dgame|PhilippeSigaud/Pegged|\
 	eBookingServices/mysql-lited|gecko0307/dlib|yazd/backtrace-d|\
