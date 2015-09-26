@@ -18,19 +18,8 @@
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers>
-    <jenkins.triggers.ReverseBuildTrigger>
-      <spec></spec>
-      <upstreamProjects>DPL,</upstreamProjects>
-      <threshold>
-        <name>SUCCESS</name>
-        <ordinal>0</ordinal>
-        <color>BLUE</color>
-        <completeBuild>true</completeBuild>
-      </threshold>
-    </jenkins.triggers.ReverseBuildTrigger>
-  </triggers>
-  <concurrentBuild>false</concurrentBuild>
+  <triggers/>
+  <concurrentBuild>true</concurrentBuild>
   <axes>
     <hudson.matrix.TextAxis>
       <name>REPO</name>
@@ -76,13 +65,19 @@
         <string>yazd/backtrace-d</string>
       </values>
     </hudson.matrix.TextAxis>
+    <hudson.matrix.LabelAxis>
+      <name>label</name>
+      <values>
+        <string>linux</string>
+        <string>osx</string>
+      </values>
+    </hudson.matrix.LabelAxis>
   </axes>
   <builders>
     <hudson.tasks.Shell>
       <command>set -o pipefail
 
-DPL=/var/lib/jenkins/jobs/DPL/workspace
-export DMD=${DPL}/dmd/src/dmd
+export DMD=${DPL_WORKSPACE}/dmd/src/dmd
 export DC=${DMD}
 
 git clone --recursive --depth=1 git://github.com/$REPO.git .
@@ -132,6 +127,18 @@ esac
     </hudson.tasks.Shell>
   </builders>
   <publishers>
+    <hudson.plugins.parameterizedtrigger.BuildTrigger plugin="parameterized-trigger@2.29">
+      <configs>
+        <hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
+          <configs>
+            <hudson.plugins.parameterizedtrigger.NodeParameters/>
+          </configs>
+          <projects>cleanup</projects>
+          <condition>ALWAYS</condition>
+          <triggerWithNoParameters>false</triggerWithNoParameters>
+        </hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
+      </configs>
+    </hudson.plugins.parameterizedtrigger.BuildTrigger>
     <hudson.plugins.ws__cleanup.WsCleanup plugin="ws-cleanup@0.28">
       <deleteDirs>false</deleteDirs>
       <skipWhenFailed>false</skipWhenFailed>
@@ -145,7 +152,13 @@ esac
       <externalDelete></externalDelete>
     </hudson.plugins.ws__cleanup.WsCleanup>
   </publishers>
-  <buildWrappers/>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.28">
+      <deleteDirs>false</deleteDirs>
+      <cleanupParameter></cleanupParameter>
+      <externalDelete></externalDelete>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+  </buildWrappers>
   <executionStrategy class="hudson.matrix.DefaultMatrixExecutionStrategyImpl">
     <runSequentially>false</runSequentially>
   </executionStrategy>
