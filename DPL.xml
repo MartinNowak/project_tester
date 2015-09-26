@@ -8,17 +8,17 @@
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>DMD_REF</name>
-          <description>stable or 5055</description>
+          <description>&apos;stable&apos;, &apos;5055&apos; or &apos;gh-user branch&apos;</description>
           <defaultValue>stable</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>DRUNTIME_REF</name>
-          <description>stable or 5055</description>
+          <description>&apos;stable&apos;, &apos;5055&apos; or &apos;gh-user branch&apos;</description>
           <defaultValue>stable</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>PHOBOS_REF</name>
-          <description>stable or 5055</description>
+          <description>&apos;stable&apos;, &apos;5055&apos; or &apos;gh-user branch&apos;</description>
           <defaultValue>stable</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
@@ -40,7 +40,9 @@ N=4
 
 # project ref
 clone() {
-    if [[ $2 =~ ^[0-9]+$ ]]; then
+    if [ $# -eq 3 ]; then
+        git clone --depth=1 -b $3 git://github.com/$2/$1.git
+    elif [[ $2 =~ ^[0-9]+$ ]]; then
         git init $1
         git -C $1 fetch --depth=1 git://github.com/D-Programming-Language/$1.git pull/$2/merge
         git -C $1 checkout FETCH_HEAD
