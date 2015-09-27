@@ -10,6 +10,13 @@
           <name>filter</name>
           <description></description>
         </hudson.plugins.matrix__configuration__parameter.MatrixCombinationsParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>DPL_WORKSPACE</name>
+          <description>/var/lib/jenkins/jobs/DPL/workspace/label/linux
+/Users/jenkins/workdir/workspace/DPL/label/osx
+</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
