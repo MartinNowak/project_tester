@@ -15,7 +15,7 @@
           <description>/var/lib/jenkins/jobs/DPL/workspace/label/linux
 /Users/jenkins/workdir/workspace/DPL/label/osx
 </description>
-          <defaultValue></defaultValue>
+          <defaultValue>/var/lib/jenkins/jobs/DPL/workspace/label/linux</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
