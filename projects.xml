@@ -113,7 +113,7 @@ case $REPO in
     # default dub projects w/o .travis.yml
 	kyllingstad/zmqd|Dgame/Dgame|PhilippeSigaud/Pegged|\
 	eBookingServices/mysql-lited|gecko0307/dlib|yazd/backtrace-d|\
-	lgvz/imageformats|s-ludwig/taggedalgebraic|mleise/fast)
+	lgvz/imageformats|s-ludwig/taggedalgebraic|mleise/fast|MyLittleRobo/inilike)
 		dub test --compiler=${DC}
 		;;
 	# matrix build for vibe.d
