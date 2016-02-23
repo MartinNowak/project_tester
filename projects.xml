@@ -119,7 +119,6 @@ case $REPO in
 	# matrix build for vibe.d
 	rejectedsoftware/vibe.d)
 		VIBED_DRIVER=libevent BUILD_EXAMPLE=1 RUN_TEST=1 ./travis-ci.sh
-		VIBED_DRIVER=libev BUILD_EXAMPLE=0 RUN_TEST=0 ./travis-ci.sh
 		VIBED_DRIVER=libasync BUILD_EXAMPLE=0 RUN_TEST=0 ./travis-ci.sh
 		;;
 	# .travis.yml
