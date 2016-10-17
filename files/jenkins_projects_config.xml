@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<matrix-project plugin="matrix-project@1.7.1">
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>true</concurrentBuild>
+  <axes>
+    <hudson.matrix.TextAxis>
+      <name>REPO</name>
+      <values>
+        <string>Abscissa/libInputVisitor</string>
+        <string>DerelictOrg/DerelictFT</string>
+        <string>DerelictOrg/DerelictGL3</string>
+        <string>DerelictOrg/DerelictGLFW3</string>
+        <string>DerelictOrg/DerelictSDL2</string>
+        <string>Hackerpilot/libdparse</string>
+        <string>ariovistus/pyd</string>
+        <string>atilaneves/unit-threaded</string>
+        <string>d-gamedev-team/gfm</string>
+        <string>dlang/dub</string>
+        <string>economicmodeling/containers</string>
+        <string>higgsjs/Higgs</string>
+        <string>kyllingstad/zmqd</string>
+        <string>lgvz/imageformats</string>
+        <string>msgpack/msgpack-d</string>
+        <string>msoucy/dproto</string>
+        <string>nomad-software/dunit</string>
+        <string>rejectedsoftware/diet-ng</string>
+        <string>rejectedsoftware/vibe.d</string>
+        <string>s-ludwig/taggedalgebraic</string>
+      </values>
+    </hudson.matrix.TextAxis>
+  </axes>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+set -o pipefail
+
+DPL_WORKSPACE=/var/lib/jenkins/jobs/DPL/workspace
+
+# env setup for dmd/phobos
+export DMD=${DPL_WORKSPACE}/dmd/src/dmd
+export DC=${DMD}
+export PATH=&quot;$(dirname ${DMD}):$PATH&quot;
+export LIBRARY_PATH=&quot;$DPL/phobos/generated/linux/release/64/:$LIBRARY_PATH&quot;
+export LD_LIBRARY_PATH=&quot;$DPL/phobos/generated/linux/release/64/:$LD_LIBRARY_PATH&quot;
+
+if [ -d .git ]; then
+    git fetch
+else
+    git clone --recursive git://github.com/$REPO.git .
+fi
+LATEST=$(git tag -l | egrep &apos;^v[0-9]+\.[0-9]+\.[0-9]+$$&apos; | sort --version-sort | tail -n 1)
+git reset --hard
+git clean -dxf &gt;/dev/null
+git checkout $LATEST
+
+case $REPO in
+	# makefile projects w/o .travis.yml
+	Hackerpilot/DCD|Hackerpilot/dfix)
+		make DMD=${DMD}
+		;;
+	gtkd-developers/GtkD)
+		make test DC=${DC}
+		;;
+    # can&apos;t use DMD/DC from env yet
+    Higgs/higgjs)
+		make -C source test DC=${DC}
+		;;
+	# matrix build for vibe.d
+	rejectedsoftware/vibe.d)
+        # use DC=dmd to workaround https://github.com/dlang/dub/pull/966
+		DC=dmd VIBED_DRIVER=libevent BUILD_EXAMPLE=1 RUN_TEST=1 ./travis-ci.sh
+		DC=dmd VIBED_DRIVER=libasync BUILD_EXAMPLE=0 RUN_TEST=0 ./travis-ci.sh
+		;;
+	# .travis.yml
+	*)
+    	if [ -f .travis.yml ]; then
+			shyaml get-values script &lt; .travis.yml 2&gt;/dev/null || \
+				shyaml get-value script &apos;dub test --compiler=$DC&apos; &lt; .travis.yml \
+            	| bash -sexo pipefail
+        else
+        	dub test --compiler=$DC
+        fi
+		;;
+esac
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+  <executionStrategy class="hudson.matrix.DefaultMatrixExecutionStrategyImpl">
+    <runSequentially>false</runSequentially>
+  </executionStrategy>
+</matrix-project>

@@ -16,6 +16,12 @@ Currently there are 3 jobs that are executed consecutively.
 - [cleanup](cleanup.xml)
   Cleans out all .dub caches and libraries.
 
+# Vagrant Setup
+
+- install vagrant and ansible (see [Ansible - Provisioning - Vagrant](https://www.vagrantup.com/docs/provisioning/ansible.html))
+- install ansible roles `ansible-galaxy install -r requirements.yml`
+- run vagrant up
+
 You need to have a recent version of dmd and dub installed. Some
 projects also need additional development libraries, e.g. libenet-dev,
 [zeromq](http://zeromq.org/), and [DSFML-C](https://github.com/Jebbs/DSFML-C).

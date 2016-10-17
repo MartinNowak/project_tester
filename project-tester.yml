@@ -1,0 +1,106 @@
+- hosts: all
+  become: True
+  vars:
+    - jenkins_admin_password: "{{ lookup('password', 'jenkins_admin_password') }}"
+    - jenkins_http_port: 9000
+    - jenkins_jobs: [cleanup, projects, DPL, dmd_trigger]
+  roles:
+    - role: geerlingguy.jenkins
+      jenkins_plugins: [ghprb, parameterized-trigger]
+      tags: jenkins
+  tasks:
+    - ufw: direction=incoming policy=deny
+    - ufw: rule=limit port=ssh proto=tcp
+    - ufw: rule=allow port=http proto=tcp
+    - ufw: rule=allow port=https proto=tcp
+    - ufw: state=enabled
+
+    - include: tasks/obtain_cert.yml
+      vars:
+        email: code@dawg.eu
+        domain: ci.dawg.eu
+        http_challenge_port: 8000
+      tags: cert
+
+    - apt: name=haproxy
+    - blockinfile:
+        dest: /etc/haproxy/haproxy.cfg
+        block: |
+          frontend http
+                  mode http
+                  bind :::80
+                  acl acme path_beg /.well-known/acme-challenge/
+                  redirect scheme https code 301 if !acme
+                  use_backend acme if acme
+          frontend https
+                  mode http
+                  bind :::443 ssl crt /etc/ssl/private
+                  http-request set-header X-Forwarded-Proto https
+                  use_backend jenkins if { ssl_fc_sni -i ci.dawg.eu }
+          backend acme # for renewing letencrypt challenges
+                  server s1 127.0.0.1:8000
+          backend jenkins
+                  server s1 127.0.0.1:9000
+      when: ansible_virtualization_type != 'virtualbox'
+      tags: haproxy
+      notify: restart haproxy
+    - blockinfile:
+        dest: /etc/haproxy/haproxy.cfg
+        block: |
+          frontend http
+                  mode http
+                  bind :::80
+                  use_backend jenkins
+          backend jenkins
+                  server s1 127.0.0.1:9000
+      when: ansible_virtualization_type == 'virtualbox'
+      tags: haproxy
+      notify: restart haproxy
+
+    - apt: update_cache=yes cache_valid_time=3600
+    - apt: name=build-essential
+    - name: test dependencies
+      apt: name={{item}}
+      with_items: [git, libevent-dev, libssl-dev, libzmq3-dev, mongodb-server, python-pip, redis-server]
+    - pip: name=shyaml version=0.4.1
+    - name: install dub
+      unarchive: src=https://code.dlang.org/files/dub-1.0.0-linux-x86_64.tar.gz dest=/usr/bin/ copy=no
+    - name: use ld.gold
+      alternatives: name=ld link=/usr/bin/ld path=/usr/bin/ld.gold
+
+    # pending jenkins restart after installing plugins
+    - meta: flush_handlers
+
+    # copied from geerlingguy.jenkins
+    - name: Wait for Jenkins to start up before proceeding.
+      shell: "curl -D - --silent --max-time 5 http://{{ jenkins_hostname }}:{{ jenkins_http_port }}{{ jenkins_url_prefix }}/cli/"
+      register: result
+      until: (result.stdout.find("403 Forbidden") != -1) or (result.stdout.find("200 OK") != -1) and (result.stdout.find("Please wait while") == -1)
+      retries: "{{ jenkins_connection_retries }}"
+      delay: "{{ jenkins_connection_delay }}"
+      changed_when: false
+
+    - copy: src=files/jenkins_{{item}}_config.xml dest=/tmp/jenkins_{{item}}_config.xml
+      with_items: "{{ jenkins_jobs }}"
+
+    - name: create DPL job
+      shell: >
+        java -jar {{ jenkins_jar_location }} -s http://{{ jenkins_hostname }}:{{ jenkins_http_port }}{{ jenkins_url_prefix | default('') }}/
+        create-job {{item}}
+        --username {{ jenkins_admin_username }}
+        --password {{ jenkins_admin_password }} < /tmp/jenkins_{{item}}_config.xml
+        creates="{{ jenkins_home }}/jobs/{{item}}"
+      with_items: "{{ jenkins_jobs }}"
+
+    - copy: src=files/jenkins_increase_executors.groovy dest=/tmp/jenkins_increase_executors.groovy
+    - name: increase number of executors
+      shell: >
+        java -jar {{ jenkins_jar_location }} -s http://{{ jenkins_hostname }}:{{ jenkins_http_port }}{{ jenkins_url_prefix | default('') }}/
+        groovy /tmp/jenkins_increase_executors.groovy
+        --username {{ jenkins_admin_username }}
+        --password {{ jenkins_admin_password }}
+      when: ansible_virtualization_type != 'virtualbox'
+
+  handlers:
+    - name: restart haproxy
+      service: name=haproxy state=restarted
