@@ -49,11 +49,10 @@ checkout() {
 
     if [[ $2 =~ ^[0-9]+$ ]]; then
         git -C $1 fetch --depth=1 git://github.com/dlang/$1.git pull/$2/merge
-        git -C $1 checkout FETCH_HEAD
     else
-    	git -C $1 fetch
-        git -C $1 checkout $2
+        git -C $1 fetch --depth=1 git://github.com/dlang/$1.git $2
     fi
+    git -C $1 checkout FETCH_HEAD
 }
 checkout dmd $DMD_REF
 checkout druntime $DRUNTIME_REF
