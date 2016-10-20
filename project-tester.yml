@@ -92,14 +92,26 @@
         creates="{{ jenkins_home }}/jobs/{{item}}"
       with_items: "{{ jenkins_jobs }}"
 
-    - copy: src=files/jenkins_increase_executors.groovy dest=/tmp/jenkins_increase_executors.groovy
-    - name: increase number of executors
+    - set_fact:
+        groovy_scripts: [increase_executors, setmarkupformatter]
+      when: ansible_virtualization_type != 'virtualbox'
+      tags: groovies
+    - set_fact:
+        groovy_scripts: [setmarkupformatter]
+      when: ansible_virtualization_type == 'virtualbox'
+      tags: groovies
+
+    - copy: src=files/jenkins_{{item}}.groovy dest=/tmp/jenkins_{{item}}.groovy
+      with_items: "{{groovy_scripts}}"
+      tags: groovies
+    - name: run groovy script
       shell: >
         java -jar {{ jenkins_jar_location }} -s http://{{ jenkins_hostname }}:{{ jenkins_http_port }}{{ jenkins_url_prefix | default('') }}/
-        groovy /tmp/jenkins_increase_executors.groovy
+        groovy /tmp/jenkins_{{item}}.groovy
         --username {{ jenkins_admin_username }}
         --password {{ jenkins_admin_password }}
-      when: ansible_virtualization_type != 'virtualbox'
+      with_items: "{{groovy_scripts}}"
+      tags: groovies
 
   handlers:
     - name: restart haproxy

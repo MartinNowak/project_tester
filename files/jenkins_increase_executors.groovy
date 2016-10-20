@@ -1,5 +1,5 @@
 // http://stackoverflow.com/a/22004283
-import hudson.model.*
+import jenkins.model.Jenkins
 
-Hudson hudson = Hudson.getInstance()
-hudson.setNumExecutors(8)
+def instance = Jenkins.getInstance()
+instance.setNumExecutors(8)
