@@ -3,7 +3,7 @@
   vars:
     - jenkins_admin_password: "{{ lookup('password', 'jenkins_admin_password') }}"
     - jenkins_http_port: 9000
-    - jenkins_jobs: [cleanup, projects, DPL, dmd_trigger]
+    - jenkins_jobs: [cleanup, projects, DPL, dmd_trigger, druntime_trigger, phobos_trigger]
   roles:
     - role: geerlingguy.jenkins
       jenkins_plugins: [ghprb, parameterized-trigger]
