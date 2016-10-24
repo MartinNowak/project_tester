@@ -77,7 +77,7 @@
 
           [Service]
           Type=simple
-          ExecStart=/bin/sh -c '. /etc/default/jenkins && $JAVA $JAVA_ARGS -jar $JENKINS_WAR $JENKINS_ARGS'
+          ExecStart=/bin/sh -c '. /etc/default/jenkins && JENKINS_HOME=$JENKINS_HOME $JAVA $JAVA_ARGS -jar $JENKINS_WAR $JENKINS_ARGS'
           User=jenkins
 
           [Install]
