@@ -68,8 +68,34 @@
     - name: use ld.gold
       alternatives: name=ld link=/usr/bin/ld path=/usr/bin/ld.gold
 
+    - name: replace jenkins init.d script
+      copy:
+        dest: /etc/systemd/system/jenkins.service
+        content: |
+          [Unit]
+          Description=Jenkins Daemon
+
+          [Service]
+          Type=simple
+          ExecStart=/bin/sh -c '. /etc/default/jenkins && $JAVA $JAVA_ARGS -jar $JENKINS_WAR $JENKINS_ARGS'
+          User=jenkins
+
+          [Install]
+          WantedBy=multi-user.target
+      notify: [daemon-reload, restart jenkins]
+    - name: limit RSS usage of jenkins
+      file: dest=/etc/systemd/system/jenkins.service.d state=directory
+    - copy:
+        dest: /etc/systemd/system/jenkins.service.d/limits.conf
+        content: |
+          [Service]
+          MemoryLimit={{ (ansible_memtotal_mb * 0.8) | int }}M
+      notify: [daemon-reload, restart jenkins]
+
     # pending jenkins restart after installing plugins
     - meta: flush_handlers
+
+    - service: name=jenkins enabled=yes
 
     # copied from geerlingguy.jenkins
     - name: Wait for Jenkins to start up before proceeding.
@@ -116,3 +142,5 @@
   handlers:
     - name: restart haproxy
       service: name=haproxy state=restarted
+    - name: daemon-reload
+      command: systemctl daemon-reload
