@@ -80,6 +80,9 @@ case $REPO in
 		DC=dmd VIBED_DRIVER=libevent BUILD_EXAMPLE=1 RUN_TEST=1 ./travis-ci.sh
 		DC=dmd VIBED_DRIVER=libasync BUILD_EXAMPLE=0 RUN_TEST=0 ./travis-ci.sh
 		;;
+	dlang/dub)
+		DC=dmd ./travis-ci.sh
+        ;;
 	# .travis.yml
 	*)
     	if [ -f .travis.yml ]; then

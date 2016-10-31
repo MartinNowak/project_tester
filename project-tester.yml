@@ -61,7 +61,7 @@
     - apt: name=build-essential
     - name: test dependencies
       apt: name={{item}}
-      with_items: [git, libevent-dev, libssl-dev, libzmq3-dev, mongodb-server, python-pip, redis-server]
+      with_items: [git, jq, libevent-dev, libssl-dev, libzmq3-dev, mongodb-server, python-pip, redis-server]
     - pip: name=shyaml version=0.4.1
     - name: install dub
       unarchive: src=https://code.dlang.org/files/dub-1.0.0-linux-x86_64.tar.gz dest=/usr/bin/ copy=no
