@@ -21,6 +21,7 @@
         domain: ci.dawg.eu
         http_challenge_port: 8000
       tags: cert
+      when: ansible_virtualization_type != 'virtualbox'
 
     - apt: name=haproxy
     - blockinfile:
