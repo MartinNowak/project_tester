@@ -119,11 +119,11 @@
       with_items: "{{ jenkins_jobs }}"
 
     - set_fact:
-        groovy_scripts: [increase_executors, setmarkupformatter]
+        groovy_scripts: [configure_system, increase_executors]
       when: ansible_virtualization_type != 'virtualbox'
       tags: groovies
     - set_fact:
-        groovy_scripts: [setmarkupformatter]
+        groovy_scripts: [configure_system]
       when: ansible_virtualization_type == 'virtualbox'
       tags: groovies
 
