@@ -40,16 +40,20 @@
           <branch></branch>
         </org.jenkinsci.plugins.ghprb.GhprbBranch>
       </blackListTargetBranches>
-      <gitHubAuthId>962bac26-2baf-4452-8865-b27d651bdc4c</gitHubAuthId>
+      <gitHubAuthId>f8bb9a8e-cc05-48f1-84e4-f872c807dade</gitHubAuthId>
       <triggerPhrase></triggerPhrase>
       <skipBuildPhrase>.*\[skip\W+ci\].*</skipBuildPhrase>
       <extensions>
         <org.jenkinsci.plugins.ghprb.extensions.status.GhprbSimpleStatus>
-          <commitStatusContext></commitStatusContext>
-          <showMatrixStatus>false</showMatrixStatus>
+          <commitStatusContext>Project Tester</commitStatusContext>
+          <triggeredStatus></triggeredStatus>
+          <startedStatus></startedStatus>
+          <statusUrl></statusUrl>
           <addTestResults>false</addTestResults>
-          <completedStatus/>
         </org.jenkinsci.plugins.ghprb.extensions.status.GhprbSimpleStatus>
+        <org.jenkinsci.plugins.ghprb.extensions.build.GhprbCancelBuildsOnUpdate>
+          <overrideGlobal>false</overrideGlobal>
+        </org.jenkinsci.plugins.ghprb.extensions.build.GhprbCancelBuildsOnUpdate>
       </extensions>
     </org.jenkinsci.plugins.ghprb.GhprbTrigger>
   </triggers>

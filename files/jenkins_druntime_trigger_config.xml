@@ -45,12 +45,15 @@
       <skipBuildPhrase>.*\[skip\W+ci\].*</skipBuildPhrase>
       <extensions>
         <org.jenkinsci.plugins.ghprb.extensions.status.GhprbSimpleStatus>
-          <commitStatusContext></commitStatusContext>
+          <commitStatusContext>Project Tester</commitStatusContext>
           <triggeredStatus></triggeredStatus>
           <startedStatus></startedStatus>
           <statusUrl></statusUrl>
           <addTestResults>false</addTestResults>
         </org.jenkinsci.plugins.ghprb.extensions.status.GhprbSimpleStatus>
+        <org.jenkinsci.plugins.ghprb.extensions.build.GhprbCancelBuildsOnUpdate>
+          <overrideGlobal>false</overrideGlobal>
+        </org.jenkinsci.plugins.ghprb.extensions.build.GhprbCancelBuildsOnUpdate>
       </extensions>
     </org.jenkinsci.plugins.ghprb.GhprbTrigger>
   </triggers>
