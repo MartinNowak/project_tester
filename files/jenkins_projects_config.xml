@@ -49,8 +49,8 @@ DPL_WORKSPACE=/var/lib/jenkins/jobs/DPL/workspace
 export DMD=${DPL_WORKSPACE}/dmd/src/dmd
 export DC=${DMD}
 export PATH=&quot;$(dirname ${DMD}):$PATH&quot;
-export LIBRARY_PATH=&quot;$DPL/phobos/generated/linux/release/64/:$LIBRARY_PATH&quot;
-export LD_LIBRARY_PATH=&quot;$DPL/phobos/generated/linux/release/64/:$LD_LIBRARY_PATH&quot;
+export LIBRARY_PATH=&quot;${DPL_WORKSPACE}/phobos/generated/linux/release/64/:$LIBRARY_PATH&quot;
+export LD_LIBRARY_PATH=&quot;${DPL_WORKSPACE}/phobos/generated/linux/release/64/:$LD_LIBRARY_PATH&quot;
 
 if [ -d .git ]; then
     git fetch
