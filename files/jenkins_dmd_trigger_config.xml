@@ -37,7 +37,7 @@
       </whiteListTargetBranches>
       <blackListTargetBranches>
         <org.jenkinsci.plugins.ghprb.GhprbBranch>
-          <branch></branch>
+          <branch>dmd-1.x</branch>
         </org.jenkinsci.plugins.ghprb.GhprbBranch>
       </blackListTargetBranches>
       <gitHubAuthId>f8bb9a8e-cc05-48f1-84e4-f872c807dade</gitHubAuthId>
