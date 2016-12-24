@@ -61,8 +61,9 @@
     - apt: update_cache=yes cache_valid_time=3600
     - apt: name=build-essential
     - name: test dependencies
-      apt: name={{item}}
-      with_items: [git, jq, libevent-dev, libssl-dev, libzmq3-dev, mongodb-server, pkg-config, python-pip, redis-server]
+      apt: name={{item}} install_recommends=no
+      with_items: [git, jq, libcairo-dev, libgtk-3-0, libevent-dev, libssl-dev, libzmq3-dev, mongodb-server, pkg-config, python-pip, redis-server]
+      tags: deps
     - pip: name=shyaml version=0.4.1
     - name: install dub
       unarchive: src=https://code.dlang.org/files/dub-1.0.0-linux-x86_64.tar.gz dest=/usr/bin/ copy=no

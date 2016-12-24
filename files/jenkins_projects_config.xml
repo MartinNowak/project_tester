@@ -16,10 +16,12 @@
       <name>REPO</name>
       <values>
         <string>Abscissa/libInputVisitor</string>
+        <string>BlackEdder/ggplotd</string>
         <string>DerelictOrg/DerelictFT</string>
         <string>DerelictOrg/DerelictGL3</string>
         <string>DerelictOrg/DerelictGLFW3</string>
         <string>DerelictOrg/DerelictSDL2</string>
+        <string>DlangScience/scid</string>
         <string>Hackerpilot/libdparse</string>
         <string>ariovistus/pyd</string>
         <string>atilaneves/unit-threaded</string>
@@ -34,6 +36,7 @@
         <string>nomad-software/dunit</string>
         <string>rejectedsoftware/diet-ng</string>
         <string>rejectedsoftware/vibe.d</string>
+        <string>repeatedly/mustache-d</string>
         <string>s-ludwig/taggedalgebraic</string>
       </values>
     </hudson.matrix.TextAxis>
@@ -83,6 +86,10 @@ case $REPO in
 	dlang/dub)
 		DC=dmd ./travis-ci.sh
         ;;
+	BlackEdder/ggplotd)
+		# workaround https://github.com/BlackEdder/ggplotd/issues/34
+		sed -i &apos;s|Random(unpredictableSeed)|Random(54321)|&apos; source/ggplotd/example.d
+		;&amp; # fall-through
 	# .travis.yml
 	*)
     	if [ -f .travis.yml ]; then
