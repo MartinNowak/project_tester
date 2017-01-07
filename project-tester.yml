@@ -166,6 +166,13 @@
       with_items: "{{groovy_scripts}}"
       tags: groovies
 
+    - name: compress logs
+      cron:
+        name: compress_logs
+        special_time: daily
+        user: jenkins
+        job: find /var/lib/jenkins/jobs/ -name log -exec gzip {} \;
+
   handlers:
     - name: restart haproxy
       service: name=haproxy state=restarted
