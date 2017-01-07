@@ -75,7 +75,7 @@ case $REPO in
 		;;
 	# can&apos;t use DMD/DC from env yet
 	higgsjs/Higgs)
-		# FIXME make -C source test DC=${DC} || echo FIXME
+		make -C source test DC=${DC}
 		;;
 	# matrix build for vibe.d
 	rejectedsoftware/vibe.d)
