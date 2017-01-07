@@ -89,7 +89,7 @@ case $REPO in
 		;;
 	BlackEdder/ggplotd)
 		# workaround https://github.com/BlackEdder/ggplotd/issues/34
-		sed -i &apos;s|Random(unpredictableSeed)|Random(54321)|&apos; source/ggplotd/example.d
+		sed -i &apos;s|auto seed = unpredictableSeed|auto seed = 54321|&apos; source/ggplotd/example.d
 		;&amp; # fall-through
 	# .travis.yml
 	*)
