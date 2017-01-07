@@ -15,17 +15,20 @@
     - ufw: rule=allow port=https proto=tcp
     - ufw: state=enabled
 
-    - include: tasks/obtain_cert.yml
-      vars:
-        email: code@dawg.eu
-        domain: ci.dawg.eu
-        http_challenge_port: 8000
-      tags: cert
-      when: ansible_virtualization_type != 'virtualbox'
-
+    # a bit complex b/c of starting haproxy w/o initial tls certificates
     - apt: name=haproxy
-    - blockinfile:
+
+    - name: remove default block
+      blockinfile:
         dest: /etc/haproxy/haproxy.cfg
+        state: absent
+      tags: [cert, haproxy]
+      notify: restart haproxy
+
+    - name: configure http frontend
+      blockinfile:
+        dest: /etc/haproxy/haproxy.cfg
+        marker: "# {mark} http"
         block: |
           frontend http
                   mode http
@@ -33,18 +36,40 @@
                   acl acme path_beg /.well-known/acme-challenge/
                   redirect scheme https code 301 if !acme
                   use_backend acme if acme
+          backend acme # for renewing letencrypt challenges
+                  server s1 127.0.0.1:8000
+      tags: [cert, haproxy]
+      when: ansible_virtualization_type != 'virtualbox'
+      notify: restart haproxy
+
+    - meta: flush_handlers
+      tags: [cert, haproxy]
+
+    - include: tasks/obtain_cert.yml
+      vars:
+        email: code@dawg.eu
+        domains: [ci.dawg.eu]
+        http_challenge_port: 8000
+        reload_cmd: systemctl reload haproxy
+      tags: cert
+      when: ansible_virtualization_type != 'virtualbox'
+
+    - name: configure haproxy
+      blockinfile:
+        dest: /etc/haproxy/haproxy.cfg
+        marker: "# {mark} tls"
+        block: |
           frontend https
                   mode http
                   bind :::443 ssl crt /etc/ssl/private
                   http-request set-header X-Forwarded-Proto https
                   use_backend jenkins if { ssl_fc_sni -i ci.dawg.eu }
-          backend acme # for renewing letencrypt challenges
-                  server s1 127.0.0.1:8000
           backend jenkins
                   server s1 127.0.0.1:9000
       when: ansible_virtualization_type != 'virtualbox'
-      tags: haproxy
+      tags: [cert, haproxy]
       notify: restart haproxy
+
     - blockinfile:
         dest: /etc/haproxy/haproxy.cfg
         block: |
