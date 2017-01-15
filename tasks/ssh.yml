@@ -1,0 +1,18 @@
+---
+- stat: path=/etc/ssh/ssh_host_dsa_key
+  register: initial_keys
+- shell:
+    echo y | ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa -b 4096;
+    echo y | ssh-keygen -f /etc/ssh/ssh_host_ed25519_key -N '' -t ed25519
+  when: initial_keys.stat.exists
+- file: dest=/etc/ssh/ssh_host_{{item}}_key state=absent
+  with_items: ['dsa', 'ecdsa']
+- file: dest=/etc/ssh/ssh_host_{{item}}_key.pub state=absent
+  with_items: ['dsa', 'ecdsa']
+- lineinfile: dest=/etc/ssh/sshd_config regexp='^#?ChallengeResponseAuthentication' line='ChallengeResponseAuthentication no'
+  notify: restart sshd
+- lineinfile: dest=/etc/ssh/sshd_config regexp='^#?PasswordAuthentication' line='PasswordAuthentication no'
+  notify: restart sshd
+- lineinfile: dest=/etc/ssh/sshd_config regexp='^#?HostKey /etc/ssh/ssh_host_{{item}}_key' state=absent
+  notify: restart sshd
+  with_items: ['dsa', 'ecdsa']

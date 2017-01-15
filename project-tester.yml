@@ -15,6 +15,9 @@
     - ufw: rule=allow port=https proto=tcp
     - ufw: state=enabled
 
+    - include: tasks/ssh.yml
+      tags: ssh
+
     # a bit complex b/c of starting haproxy w/o initial tls certificates
     - apt: name=haproxy
 
@@ -174,7 +177,11 @@
         job: find /var/lib/jenkins/jobs/ -name log -exec gzip {} \;
 
   handlers:
-    - name: restart haproxy
-      service: name=haproxy state=restarted
+    # needs to be top as handlers are executed in order of declaration
     - name: daemon-reload
       command: systemctl daemon-reload
+
+    - name: restart sshd
+      service: name=sshd state=restarted
+    - name: restart haproxy
+      service: name=haproxy state=restarted
