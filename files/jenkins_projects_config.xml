@@ -93,6 +93,9 @@ case $REPO in
 		jq &apos;.versions[&quot;vibe-d&quot;]=&quot;0.7.31-beta.2&quot;&apos; &lt; dub.selections.json | sponge dub.selections.json
 		DC=dmd ./travis-ci.sh
 		;;
+    msgpack/msgpack-d)
+		DMD=$DMD MODEL=64 make -f posix.mak unittest
+		;;
 	BlackEdder/ggplotd)
 		# workaround https://github.com/BlackEdder/ggplotd/issues/34
 		sed -i &apos;s|auto seed = unpredictableSeed|auto seed = 54321|&apos; source/ggplotd/example.d
