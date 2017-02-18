@@ -96,6 +96,10 @@ case $REPO in
     msgpack/msgpack-d)
 		DMD=$DMD MODEL=64 make -f posix.mak unittest
 		;;
+    economicmodeling/containers)
+		git submodule update --init --recursive
+		make -B -C test/ || echo failed
+		;;
 	BlackEdder/ggplotd)
 		# workaround https://github.com/BlackEdder/ggplotd/issues/34
 		sed -i &apos;s|auto seed = unpredictableSeed|auto seed = 54321|&apos; source/ggplotd/example.d
