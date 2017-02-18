@@ -94,8 +94,8 @@ case $REPO in
 	# .travis.yml
 	*)
     	if [ -f .travis.yml ]; then
-			shyaml get-values script &lt; .travis.yml 2&gt;/dev/null || \
-				shyaml get-value script &apos;dub test --compiler=$DC&apos; &lt; .travis.yml \
+			{ shyaml get-values script &lt; .travis.yml 2&gt;/dev/null || \
+				shyaml get-value script &apos;dub test --compiler=$DC&apos; &lt; .travis.yml; } \
             	| bash -sexo pipefail
         else
         	dub test --compiler=$DC
